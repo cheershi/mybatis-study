@@ -1,2 +1,2 @@
 # mybatis-study
-本文为学习mybatis的笔记
+本文为学习mybatis源码的笔记
