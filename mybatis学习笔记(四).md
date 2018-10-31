@@ -1,12 +1,12 @@
 # mybatis学习笔记(四)
 
-## -SQL执行流程分析
+## SQL执行流程分析
 
-1. SqlSessionFactory 与 SqlSession.
+### 1. SqlSessionFactory 与 SqlSession.
 
 　　通过前面的章节对于mybatis 的介绍及使用，大家都能体会到SqlSession的重要性了吧， 没错，从表面上来看，咱们都是通过SqlSession去执行sql语句（注意：是从表面看，实际的待会儿就会讲）。那么咱们就先看看是怎么获取SqlSession的吧：
   
-  （1）首先，SqlSessionFactoryBuilder去读取mybatis的配置文件，然后build一个DefaultSqlSessionFactory。源码如下：
+####   （1）首先，SqlSessionFactoryBuilder去读取mybatis的配置文件，然后build一个DefaultSqlSessionFactory。源码如下：
   
       /**
        * 一系列的构造方法最终都会调用本方法（配置文件为Reader时会调用本方法，还有一个InputStream方法与此对应）
@@ -37,7 +37,7 @@
         return new DefaultSqlSessionFactory(config);
       }
       
- （2）当我们获取到SqlSessionFactory之后，就可以通过SqlSessionFactory去获取SqlSession对象。源码如下：
+####  （2）当我们获取到SqlSessionFactory之后，就可以通过SqlSessionFactory去获取SqlSession对象。源码如下：
  
      /**
        * 通常一系列openSession方法最终都会调用本方法
@@ -66,12 +66,14 @@
       }
       
    通过以上步骤，咱们已经得到SqlSession对象了。
+ 
+###  2.SqlSession
    
    SqlSession咱们也拿到了，咱们可以调用SqlSession中一系列的select...,  insert..., update..., delete...方法轻松自如的进行CRUD操作了。 就这样？ 那咱配置的映射文件去哪儿了？  别急， 咱们接着往下看：
    
    在mybatis中，通过MapperProxy动态代理咱们的dao， 也就是说， 当咱们执行自己写的dao里面的方法的时候，其实是对应的mapperProxy在代理。那么，咱们就看看怎么获取MapperProxy对象吧：
    
-   （1）通过SqlSession从Configuration中获取。源码如下：
+####    （1）通过SqlSession从Configuration中获取。源码如下：
    
        /**
        * 什么都不做，直接去configuration中找， 哥就是这么任性
@@ -81,7 +83,7 @@
         return configuration.<T>getMapper(type, this);
       }
       
-（2）SqlSession把包袱甩给了Configuration, 接下来就看看Configuration。源码如下：
+#### （2）SqlSession把包袱甩给了Configuration, 接下来就看看Configuration。源码如下：
 
     /**
        * 烫手的山芋，俺不要，你找mapperRegistry去要
@@ -93,7 +95,7 @@
         return mapperRegistry.getMapper(type, sqlSession);
       }
       
-  （3）Configuration不要这烫手的山芋，接着甩给了MapperRegistry， 那咱看看MapperRegistry。 源码如下：
+ #### （3）Configuration不要这烫手的山芋，接着甩给了MapperRegistry， 那咱看看MapperRegistry。 源码如下：
   
       /**
        * 烂活净让我来做了，没法了，下面没人了，我不做谁来做
@@ -116,7 +118,7 @@
         }
       }
       
- (4)MapperProxyFactory是个苦B的人，粗活最终交给它去做了。咱们看看源码：
+####  (4)MapperProxyFactory是个苦B的人，粗活最终交给它去做了。咱们看看源码：
  
      /**
        * 别人虐我千百遍，我待别人如初恋
@@ -142,7 +144,7 @@
 
 别急，还没完， 咱们还没看具体是怎么执行sql语句的呢。
 
-3. Excutor:
+### 3. Excutor:
 
 接下来，咱们才要真正去看sql的执行过程了。
 
