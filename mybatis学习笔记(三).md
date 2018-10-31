@@ -421,3 +421,46 @@ TypeHandlerRegistry：
       }
 
     }
+    
+ ExampleTypeHandler:
+
+
+    @MappedJdbcTypes(JdbcType.VARCHAR)  
+    //此处如果不用注解指定jdbcType, 那么，就可以在配置文件中通过"jdbcType"属性指定， 同理， javaType 也可通过 @MappedTypes指定
+    public class ExampleTypeHandler extends BaseTypeHandler<String> {
+
+      @Override
+      public void setNonNullParameter(PreparedStatement ps, int i, String parameter, JdbcType jdbcType) throws SQLException {
+        ps.setString(i, parameter);
+      }
+
+      @Override
+      public String getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        return rs.getString(columnName);
+      }
+
+      @Override
+      public String getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+        return rs.getString(columnIndex);
+      }
+
+      @Override
+      public String getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+        return cs.getString(columnIndex);
+      }
+    }
+
+然后，就该配置我们的自定义TypeHandler了：
+
+
+    <configuration>
+      <typeHandlers>
+          <!-- 由于自定义的TypeHandler在定义时已经通过注解指定了jdbcType, 所以此处不用再配置jdbcType -->
+          <typeHandler handler="ExampleTypeHandler"/>
+      </typeHandlers>
+
+      ......
+
+    </configuration>
+
+### 也就是说，我们在自定义TypeHandler的时候，可以在TypeHandler通过@MappedJdbcTypes指定jdbcType, 通过 @MappedTypes 指定javaType, 如果没有使用注解指定，那么我们就需要在配置文件中配置。
